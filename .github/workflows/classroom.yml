@@ -1,0 +1,60 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Add note with special characters
+      id: add-note-with-special-characters
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Add note with special characters
+        setup-command: ''
+        command: "./test_note.sh test_add_note_with_special_characters"
+        timeout: 10
+        max-score: 5
+    - name: List notes after adding
+      id: list-notes-after-adding
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: List notes after adding
+        setup-command: ''
+        command: "./test_note.sh test_list_notes_after_adding"
+        timeout: 10
+        max-score: 20
+    - name: Check date/time format
+      id: check-date-time-format
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Check date/time format
+        setup-command: ''
+        command: "./test_note.sh test_check_date_time_format"
+        timeout: 10
+        max-score: 10
+    - name: Search notes
+      id: search-notes
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Search notes
+        setup-command: ''
+        command: "./test_note.sh test_search_notes"
+        timeout: 10
+        max-score: 15
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        ADD-NOTE-WITH-SPECIAL-CHARACTERS_RESULTS: "${{steps.add-note-with-special-characters.outputs.result}}"
+        LIST-NOTES-AFTER-ADDING_RESULTS: "${{steps.list-notes-after-adding.outputs.result}}"
+        CHECK-DATE-TIME-FORMAT_RESULTS: "${{steps.check-date-time-format.outputs.result}}"
+        SEARCH-NOTES_RESULTS: "${{steps.search-notes.outputs.result}}"
+      with:
+        runners: add-note-with-special-characters,list-notes-after-adding,check-date-time-format,search-notes
